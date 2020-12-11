@@ -22,9 +22,10 @@ int main(int argc, char** argv) {
      * -r : Recursive
      * -f : Force
      * -v : verbose
+     * -s : show trash data -- even every flag set, it does not remove anything.
      */
     char c;
-    while ((c = getopt(argc, argv, "rvf")) != -1) {
+    while ((c = getopt(argc, argv, "rvfs")) != -1) {
         switch(c) {
             case 'r':
                 usr_de.setRecursive(true);
@@ -34,6 +35,10 @@ int main(int argc, char** argv) {
             break;
             case 'v':
                 usr_de.setVerbose(true);
+            break;
+            case 's':
+                trash_manager.show_trashinfo();
+                return 0;
             break;
             case '?':
                 cerr << "Unknown Argument" << endl;

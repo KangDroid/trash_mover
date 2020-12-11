@@ -30,4 +30,5 @@ public:
     ~TrashManager();
     void move_to_trash(filesystem::path& target, UserDefinition& udf);
     void setargs(int argc, char** args);
+    void show_trashinfo();
 };

@@ -57,6 +57,21 @@ void TrashManager::setargs(int argc, char** args) {
     }
 }
 
+void TrashManager::show_trashinfo() {
+    for (int i = 0; i < trash_list.size(); i++) {
+        time_t del_time = trash_list.at(i).getDeletionTime();
+        string tim_str = string(ctime(&del_time));
+        tim_str = remove_newline(tim_str);
+        cout << "File " << i + 1 << ":" << endl;
+        cout << "Original FileDirectory[before delete]: " << trash_list.at(i).getFileDir() << endl;
+        cout << "Deletion Time: " << tim_str << endl;
+        cout << "Deletion ARGS: " << trash_list.at(i).getArgsList() << endl;
+        cout << "CWD when executed: " << trash_list.at(i).getExeDir() << endl;
+        cout << "Current file location[in trash]: " << trash_list.at(i).getTrashDir() << endl;
+        cout << endl;
+    }
+}
+
 /**
  * Checks for any duplicated[same-name] file on trash.
  * param: target - the filename to check, trash - the trash location.
