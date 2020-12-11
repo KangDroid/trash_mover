@@ -1,3 +1,6 @@
+#ifndef __USERDEFINITION_H__
+#define __USERDEFINITION_H__
+
 #include <iostream>
 
 using namespace std;
@@ -22,3 +25,4 @@ private:
     // if true, show all information, like "move", otherwise do not show information.
     bool is_verbose;
 };
+#endif // __USERDEFINITION_H__
