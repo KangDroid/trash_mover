@@ -76,6 +76,16 @@ void move_to_trash(filesystem::path& target, UserDefinition& udf) {
     if (udf.isVerbose()) {
         cout << filesystem::absolute(target) << " --> " << destination_target << endl;
     }
+
+    if (!udf.isForce()) {
+        string really;
+        cout << "Really delete " << filesystem::absolute(target) << "?[y/n] : ";
+        getline(cin, really);
+        if (really != "y" && really != "yes") {
+            cout << "Abort." << endl;
+            return;
+        }
+    }
     filesystem::rename(filesystem::absolute(target), destination_target);
 }
 
