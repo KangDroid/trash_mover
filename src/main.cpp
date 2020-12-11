@@ -11,6 +11,7 @@ using namespace std;
 int main(int argc, char** argv) {
     UserDefinition usr_de;
     TrashManager trash_manager;
+    trash_manager.setargs(argc, argv);
     if (argc < 2) {
         cerr << "Needs at least one argument to delete some files!" << endl;
         return -1;

@@ -39,7 +39,22 @@ void TrashManager::move_to_trash(filesystem::path& target, UserDefinition& udf) 
             return;
         }
     }
+
+    // Append some information just before delete.
+    trash_list.push_back(create_trashdata(filesystem::absolute(target), trash_path));
+    // move to trash!
     filesystem::rename(filesystem::absolute(target), destination_target);
+}
+
+void TrashManager::setargs(int argc, char** args) {
+    args_list = "";
+    for (int i = 0; i < argc; i++) {
+        if (i == argc - 1) {
+            args_list += string(args[i]);
+        } else {
+            args_list += string(args[i]) + " ";
+        }
+    }
 }
 
 /**
@@ -57,6 +72,115 @@ void TrashManager::get_new_filename(filesystem::path& target, filesystem::path& 
             return_value = trash / (target.filename().string() + " " + tim_str);
         }
     }
+}
+
+/**
+ * Load trashdata from file to memory.
+ * 
+ * The file format
+ * 
+ * deletion_date\targs_list\tecwd\tfilename\trashdir
+ */
+void TrashManager::init_trashdata() {
+    // Need to handle if file is not opened.
+    if (!files_open.is_open()) {
+        cerr << "Trash data is NOT opened." << endl;
+        return;
+    }
+    string buffer; // TEMP buffer
+    while (getline(files_open, buffer)) {
+        // parse its string.
+        trash_list.push_back(create_trashdata(split_string(buffer, '\t'))); // split string first, create trashdata, and push back.
+    }
+}
+
+/**
+ * Create Trash data from input lists
+ * The lists should be sorted by file-written type,
+ * idx 0: deletion date
+ * idx 1: args list
+ * idx 2: execution cwd
+ * idx 3: file name[dir]
+ * idx 4: trash dir
+ */
+TrashData TrashManager::create_trashdata(vector<string> lists) {
+    TrashData trash_data;
+    trash_data.setDeletionTime(stoi(lists.at(0)));
+    trash_data.setArgsList(lists.at(1));
+    trash_data.setExeDir(lists.at(2));
+    trash_data.setFileDir(lists.at(3));
+    trash_data.setTrashDir(lists.at(4));
+
+    return trash_data;
+}
+
+/**
+ * Overloaded function. 
+ * 
+ * Two create_trashdata are completely differ, one is creating trashdata from file,
+ * other one is creating trashdata from current run - time.
+ */
+TrashData TrashManager::create_trashdata(filesystem::path abstarget, filesystem::path trashdir) {
+    char* buffer = new char[USERNAME_LIMIT];
+    TrashData trash_data;
+    trash_data.setDeletionTime(time(NULL));
+    trash_data.setArgsList(args_list);
+    trash_data.setExeDir(string(getcwd(buffer, USERNAME_LIMIT)));
+    trash_data.setFileDir(abstarget.string());
+    trash_data.setTrashDir(trashdir.string());
+    delete[] buffer;
+
+    return trash_data;
+}
+
+/**
+ * Split strings
+ */
+vector<string> TrashManager::split_string(string& input, char delim) {
+    vector<string> ret_val;
+    string tmpbuffer = "";
+    for (int i = 0; i < input.length(); i++) {
+        if (input.at(i) == delim) {
+            ret_val.push_back(tmpbuffer);
+            tmpbuffer = "";
+        } else {
+            tmpbuffer += input.at(i);
+        }
+    }
+
+    if (tmpbuffer.length() != 0) {
+        ret_val.push_back(tmpbuffer);
+    }
+
+    return ret_val;
+}
+
+TrashManager::TrashManager() {
+    files_open.open("/usr/local/kangdroid/trash_lists");
+    if (!files_open.is_open()) {
+        cerr << "Trash data open failed." << endl;
+        return;
+    }
+
+    init_trashdata();
+}
+
+TrashManager::~TrashManager() {
+    if (files_open.is_open()) {
+        files_open.close();
+    }
+
+    write_open.open("/usr/local/kangdroid/trash_lists", ios::trunc);
+    if (!write_open.is_open()) {
+        cerr << "Writing trash data open failed" << endl;
+        return;
+    }
+
+    for (int i = 0; i < trash_list.size(); i++) {
+        write_open << trash_list.at(i).getDeletionTime() << "\t" << trash_list.at(i).getArgsList() << "\t" << trash_list.at(i).getExeDir() << "\t" << trash_list.at(i).getFileDir() << "\t" << trash_list.at(i).getTrashDir() << endl;
+    }
+
+    files_open.close();
 }
 
 /**
