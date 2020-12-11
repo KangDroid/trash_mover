@@ -12,4 +12,4 @@ set(CMAKE_CXX_FLAGS "-DDEFAULT_SAMPLE_DIR=\"\\\"${CMAKE_INSTALL_PREFIX}\\\"\" -W
 
 include_directories(${TrashMover_SOURCE_DIR}/include)
 
-add_executable(TrashMover src/main.cpp)
+add_executable(TrashMover src/main.cpp src/UserDefinition.cpp)

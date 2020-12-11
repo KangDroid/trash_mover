@@ -3,30 +3,17 @@
 #include <filesystem>
 #include <unistd.h>
 
+#include "UserDefinition.h"
+
 using namespace std;
 
 #define USERNAME_LIMIT 1024
 
-class UserDefinition {
-public:
-    UserDefinition() {
-        this->is_recursive_delete = false;
-        this->is_verbose = false;
-        this->is_force = false;
-    }
-    void setRecursive(bool val) {this->is_recursive_delete = val;}
-    void setForce(bool val) {this->is_force = val;}
-    void setVerbose(bool val) {this->is_verbose = val;}
-
-    bool isRecursive() {return this->is_recursive_delete;}
-    bool isForce() {return this->is_force;}
-    bool isVerbose() {return this->is_verbose;}
-private:
-    bool is_recursive_delete;
-    bool is_force;
-    bool is_verbose;
-};
-
+/**
+ * Get current logged-in username.
+ * param: N/A
+ * returns: Current user name in string
+ */
 string get_usr_name() {
     char* username_arr = new char[USERNAME_LIMIT];
     if (getlogin_r(username_arr, USERNAME_LIMIT) != 0) {
@@ -37,6 +24,11 @@ string get_usr_name() {
     return ret_val;
 }
 
+/**
+ * get_usr_name incldudes some newline at the end. Remove it.
+ * param: The string contains newline.
+ * returns: Newline - Removed string.
+ */
 string remove_newline(string& target) {
     string ret_val = "";
     for (int i = 0; i < target.length(); i++) {
@@ -52,6 +44,8 @@ void move_to_trash(filesystem::path& target, UserDefinition& udf) {
     // Get username
     string username_str = get_usr_name();
     filesystem::path trash_path("/Users/"+username_str+"/.Trash");
+
+    // Check if NO trash directory found.
     if (!filesystem::exists(trash_path)) {
         cerr << "No such file or directory: " << trash_path.string() << endl;
         cerr << "Contact Developer with log" << endl;
@@ -71,9 +65,9 @@ void move_to_trash(filesystem::path& target, UserDefinition& udf) {
         }
     }
 
-    // if (udf.isVerbose()) {
+    if (udf.isVerbose()) {
         cout << filesystem::absolute(target) << " --> " << destination_target << endl;
-    // }
+    }
     filesystem::rename(filesystem::absolute(target), destination_target);
 }
 
