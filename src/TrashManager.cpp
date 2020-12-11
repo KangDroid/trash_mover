@@ -41,7 +41,7 @@ void TrashManager::move_to_trash(filesystem::path& target, UserDefinition& udf) 
     }
 
     // Append some information just before delete.
-    trash_list.push_back(create_trashdata(filesystem::absolute(target), trash_path));
+    trash_list.push_back(create_trashdata(filesystem::absolute(target), destination_target));
     // move to trash!
     filesystem::rename(filesystem::absolute(target), destination_target);
 }
