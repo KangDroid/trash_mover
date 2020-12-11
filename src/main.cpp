@@ -89,12 +89,6 @@ void move_to_trash(filesystem::path& target, UserDefinition& udf) {
     filesystem::rename(filesystem::absolute(target), destination_target);
 }
 
-/**
- * Supported Options
- * -r : Recursive
- * -f : Force
- * -v : verbose
- */
 int main(int argc, char** argv) {
     UserDefinition usr_de;
     if (argc < 2) {
@@ -102,6 +96,12 @@ int main(int argc, char** argv) {
         return -1;
     }
 
+    /**
+     * Supported Options
+     * -r : Recursive
+     * -f : Force
+     * -v : verbose
+     */
     char c;
     while ((c = getopt(argc, argv, "rvf")) != -1) {
         switch(c) {
