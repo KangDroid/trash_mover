@@ -49,6 +49,7 @@ void move_to_trash(filesystem::path& target, UserDefinition& udf) {
     if (!filesystem::exists(trash_path)) {
         cerr << "No such file or directory: " << trash_path.string() << endl;
         cerr << "Contact Developer with log" << endl;
+        return;
     }
 
     // Default Target directory
