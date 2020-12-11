@@ -52,6 +52,13 @@ void move_to_trash(filesystem::path& target, UserDefinition& udf) {
         return;
     }
 
+    // Return when type is folder, but -r option is not specified.
+    if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.isRecursive()) {
+        cerr << "Recursive -r option is not specified, but folder is found." << endl;
+        cerr << "Omitting directory: " << target << endl;
+        return;
+    }
+
     // Default Target directory
     destination_target = trash_path / target.filename();
 
