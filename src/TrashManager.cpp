@@ -67,7 +67,11 @@ void TrashManager::show_trashinfo() {
         cout << "Deletion Time: " << tim_str << endl;
         cout << "Deletion ARGS: " << trash_list.at(i).getArgsList() << endl;
         cout << "CWD when executed: " << trash_list.at(i).getExeDir() << endl;
-        cout << "Current file location[in trash]: " << trash_list.at(i).getTrashDir() << endl;
+        if (trash_list.at(i).getDeprecated()) {
+            cout << "Current file location[in trash] - NOT EXISTS[Empty Trash bin from other process?]: " << trash_list.at(i).getTrashDir() << endl;
+        } else {
+            cout << "Current file location[in trash]: " << trash_list.at(i).getTrashDir() << endl;
+        }
         cout << endl;
     }
 }
@@ -126,6 +130,18 @@ TrashData TrashManager::create_trashdata(vector<string> lists) {
     trash_data.setFileDir(lists.at(3));
     trash_data.setTrashDir(lists.at(4));
 
+    /**
+     * Since FILE does not exists in trash can,
+     * because User emptied trash bin from other process[i.e Finder] therefore
+     * the user file defined on our trashdata might not acutally existss.
+     * So, set some flag[deprecated value] if actual file is not on trash can.
+     */
+    if (!filesystem::exists(filesystem::path(trash_data.getTrashDir()))) {
+        trash_data.setDeprecated(true);
+    } else {
+        trash_data.setDeprecated(false);
+    }
+
     return trash_data;
 }
 
@@ -143,6 +159,10 @@ TrashData TrashManager::create_trashdata(filesystem::path abstarget, filesystem:
     trash_data.setExeDir(string(getcwd(buffer, USERNAME_LIMIT)));
     trash_data.setFileDir(abstarget.string());
     trash_data.setTrashDir(trashdir.string());
+
+    // For this case[new-trash data] deprecated field should be false though.
+    trash_data.setDeprecated(false);
+
     delete[] buffer;
 
     return trash_data;

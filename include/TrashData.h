@@ -21,6 +21,7 @@ private:
     string execution_directory; // Where was the binary-execution directory?
     string file_directory; // Original Full file directory
     string trash_directory; // Trash location
+    bool is_deprecated; // If trash bin is modified by other process[i.e Finder].
 
 public:
     // Getter
@@ -29,6 +30,7 @@ public:
     string getExeDir();
     string getFileDir();
     string getTrashDir();
+    bool getDeprecated();
 
     // Setter
     void setDeletionTime(time_t timeval);
@@ -36,5 +38,6 @@ public:
     void setExeDir(string exdir);
     void setFileDir(string filddir);
     void setTrashDir(string trashdir);
+    void setDeprecated(bool dep);
 };
 #endif // __TRASHDATA_H__
