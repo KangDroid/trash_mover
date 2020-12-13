@@ -345,6 +345,11 @@ void TrashManager::empty_trash() {
         }
     }
 
+    if (counter == 0) {
+        cerr << "Nothing to erase!" << endl;
+        return;
+    }
+
     string really;
     cout << "Are you really sure to empty trashcan[" << trash_path.string() << "]?" << endl;
     cout << "Confirm these files are removed from trashcan!" << endl;
