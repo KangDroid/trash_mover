@@ -18,6 +18,7 @@ private:
     ofstream write_open;
     map<string, TrashData> trash_list;
     string args_list;
+    vector<string> file_to_remove;
 
     string get_usr_name();
     string remove_newline(string& target);
@@ -29,7 +30,7 @@ private:
 public:
     TrashManager();
     ~TrashManager();
-    void move_to_trash(filesystem::path& target, UserDefinition& udf);
-    void setargs(int argc, char** args);
+    void move_to_trash(UserDefinition& udf);
+    int setargs(int argc, char** args, UserDefinition& usr_de);
     void show_trashinfo();
 };

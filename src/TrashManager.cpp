@@ -1,60 +1,114 @@
 #include "TrashManager.h"
 
-void TrashManager::move_to_trash(filesystem::path& target, UserDefinition& udf) {
-    filesystem::path destination_target;
-    // Get username
-    string username_str = get_usr_name();
-    filesystem::path trash_path("/Users/"+username_str+"/.Trash");
+void TrashManager::move_to_trash(UserDefinition& udf) {
+    for (int i = 0; i < file_to_remove.size(); i++) {
+        filesystem::path target(file_to_remove.at(i));
+        filesystem::path destination_target;
+        // Get username
+        string username_str = get_usr_name();
+        filesystem::path trash_path("/Users/"+username_str+"/.Trash");
 
-    // Check if NO trash directory found.
-    if (!filesystem::exists(trash_path)) {
-        cerr << "No such file or directory: " << trash_path.string() << endl;
-        cerr << "Contact Developer with log" << endl;
-        return;
-    }
-
-    // Return when type is folder, but -r option is not specified.
-    if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.isRecursive()) {
-        cerr << "Recursive -r option is not specified, but folder is found." << endl;
-        cerr << "Omitting directory: " << target << endl;
-        return;
-    }
-
-    // Default Target directory
-    destination_target = trash_path / target.filename();
-
-    // Scan trash if same filename exists.
-    get_new_filename(target, trash_path, destination_target);
-
-    if (udf.isVerbose()) {
-        cout << filesystem::absolute(target) << " --> " << destination_target << endl;
-    }
-
-    if (!udf.isForce()) {
-        string really;
-        cout << "Really delete " << filesystem::absolute(target) << "?[y/n] : ";
-        getline(cin, really);
-        if (really != "y" && really != "yes") {
-            cout << "Abort." << endl;
+        // Check if NO trash directory found.
+        if (!filesystem::exists(trash_path)) {
+            cerr << "No such file or directory: " << trash_path.string() << endl;
+            cerr << "Contact Developer with log" << endl;
             return;
         }
-    }
 
-    // Append some information just before delete.
-    trash_list.insert(make_pair(filesystem::absolute(destination_target), create_trashdata(filesystem::absolute(target), destination_target)));
-    // move to trash!
-    filesystem::rename(filesystem::absolute(target), destination_target);
+        // Return when type is folder, but -r option is not specified.
+        if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.isRecursive()) {
+            cerr << "Recursive -r option is not specified, but folder is found." << endl;
+            cerr << "Omitting directory: " << target << endl;
+            return;
+        }
+
+        // Default Target directory
+        destination_target = trash_path / target.filename();
+
+        // Scan trash if same filename exists.
+        get_new_filename(target, trash_path, destination_target);
+
+        if (udf.isVerbose()) {
+            cout << filesystem::absolute(target) << " --> " << destination_target << endl;
+        }
+
+        if (!udf.isForce()) {
+            string really;
+            cout << "Really delete " << filesystem::absolute(target) << "?[y/n] : ";
+            getline(cin, really);
+            if (really != "y" && really != "yes") {
+                cout << "Abort." << endl;
+                return;
+            }
+        }
+
+        // Append some information just before delete.
+        trash_list.insert(make_pair(filesystem::absolute(destination_target), create_trashdata(filesystem::absolute(target), destination_target)));
+        // move to trash!
+        filesystem::rename(filesystem::absolute(target), destination_target);
+    }
 }
 
-void TrashManager::setargs(int argc, char** args) {
+int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
+    if (argc < 2) {
+        cerr << "Needs at least one argument to delete some files!" << endl;
+        return -1;
+    }
+    /**
+     * Supported Options
+     * -r : Recursive
+     * -f : Force
+     * -v : verbose
+     * -s : show trash data -- even every flag set, it does not remove anything.
+     */
+    char c;
+    while ((c = getopt(argc, args, "rvfs")) != -1) {
+        switch(c) {
+            case 'r':
+                usr_de.setRecursive(true);
+            break;
+            case 'f':
+                usr_de.setForce(true);
+            break;
+            case 'v':
+                usr_de.setVerbose(true);
+            break;
+            case 's':
+                this->show_trashinfo();
+                return 0;
+            break;
+            case '?':
+                cerr << "Unknown Argument" << endl;
+                return -1;
+            break;
+        }
+    }
+    
+    // Parse
     args_list = "";
-    for (int i = 0; i < argc; i++) {
+    for (int i = 1; i < argc; i++) {
         if (i == argc - 1) {
             args_list += string(args[i]);
         } else {
             args_list += string(args[i]) + " ";
         }
+
+        if (string(args[i]).at(0) == '-') {
+            continue;
+        } else {
+            string path_tmp = string(args[i]);
+            filesystem::path current_path(path_tmp);
+            if (!filesystem::exists(current_path)) {
+                cerr << "Path: " << current_path << " does not exists!" << endl;
+                return -1;
+            } else {
+                // move to trash
+                file_to_remove.push_back(current_path);
+            }
+        }
     }
+
+    return 0;
 }
 
 void TrashManager::show_trashinfo() {
