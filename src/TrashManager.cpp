@@ -16,7 +16,7 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         }
 
         // Return when type is folder, but -r option is not specified.
-        if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.isRecursive()) {
+        if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.is_recursive_delete) {
             cerr << "Recursive -r option is not specified, but folder is found." << endl;
             cerr << "Omitting directory: " << target << endl;
             return;
@@ -28,11 +28,11 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         // Scan trash if same filename exists.
         get_new_filename(target, trash_path, destination_target);
 
-        if (udf.isVerbose()) {
+        if (udf.is_verbose) {
             cout << filesystem::absolute(target) << " --> " << destination_target << endl;
         }
 
-        if (!udf.isForce()) {
+        if (!udf.is_force) {
             string really;
             cout << "Really delete " << filesystem::absolute(target) << "?[y/n] : ";
             getline(cin, really);
@@ -65,13 +65,13 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
     while ((c = getopt(argc, args, "rvfs")) != -1) {
         switch(c) {
             case 'r':
-                usr_de.setRecursive(true);
+                usr_de.is_recursive_delete = true;
             break;
             case 'f':
-                usr_de.setForce(true);
+                usr_de.is_force = true;
             break;
             case 'v':
-                usr_de.setVerbose(true);
+                usr_de.is_verbose = true;
             break;
             case 's':
                 this->show_trashinfo();

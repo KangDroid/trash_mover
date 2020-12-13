@@ -8,21 +8,14 @@ using namespace std;
 class UserDefinition {
 public:
     UserDefinition();
-    void setRecursive(bool val);
-    void setForce(bool val);
-    void setVerbose(bool val);
-
-    bool isRecursive();
-    bool isForce();
-    bool isVerbose();
-private:
+public:
     // if true, enable recursive delete, otherwise do not perform recursive-delete.
-    bool is_recursive_delete;
+    int is_recursive_delete;
 
     // if true, force delete, otherwise ask.
-    bool is_force;
+    int is_force;
 
     // if true, show all information, like "move", otherwise do not show information.
-    bool is_verbose;
+    int is_verbose;
 };
 #endif // __USERDEFINITION_H__
