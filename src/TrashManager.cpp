@@ -352,7 +352,7 @@ void TrashManager::empty_trash() {
 
     string really;
     cout << "Are you really sure to empty trashcan[" << trash_path.string() << "]?" << endl;
-    cout << "Confirm these files are removed from trashcan!" << endl;
+    cout << "Confirm these files are removed from trashcan![" << counter << " Files!]" << endl;
     cout << remove_verification << endl;
     cout << "Confirm?[y/n] : ";
     getline(cin, really);
