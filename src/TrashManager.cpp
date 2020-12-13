@@ -370,7 +370,13 @@ void TrashManager::empty_trash() {
 }
 
 TrashManager::TrashManager() {
-    trash_data_lists = "/usr/local/kangdroid/trash_lists";
+    
+    /**
+     * The thing: What if we need to use "sudo"?
+     * TODO: Relying username might not ideal if we need to use "sudo"
+     */
+    string usr_name = this->get_usr_name();
+    trash_data_lists = "/Users/" + usr_name + "/.trash_lists";
     files_open.open(trash_data_lists);
     if (!files_open.is_open()) {
         cerr << "Trash data open failed." << endl;
