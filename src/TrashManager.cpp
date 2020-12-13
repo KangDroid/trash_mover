@@ -41,7 +41,7 @@ void TrashManager::move_to_trash(filesystem::path& target, UserDefinition& udf) 
     }
 
     // Append some information just before delete.
-    trash_list.push_back(create_trashdata(filesystem::absolute(target), destination_target));
+    trash_list.insert(make_pair(filesystem::absolute(destination_target), create_trashdata(filesystem::absolute(target), destination_target)));
     // move to trash!
     filesystem::rename(filesystem::absolute(target), destination_target);
 }
@@ -58,19 +58,20 @@ void TrashManager::setargs(int argc, char** args) {
 }
 
 void TrashManager::show_trashinfo() {
-    for (int i = 0; i < trash_list.size(); i++) {
-        time_t del_time = trash_list.at(i).getDeletionTime();
+    int counter = 0;
+    for (auto i = trash_list.begin(); i != trash_list.end(); i++,counter++) {
+        time_t del_time = i->second.getDeletionTime();
         string tim_str = string(ctime(&del_time));
         tim_str = remove_newline(tim_str);
-        cout << "File " << i + 1 << ":" << endl;
-        cout << "Original FileDirectory[before delete]: " << trash_list.at(i).getFileDir() << endl;
+        cout << "File " << counter + 1 << ":" << endl;
+        cout << "Original FileDirectory[before delete]: " << i->second.getFileDir() << endl;
         cout << "Deletion Time: " << tim_str << endl;
-        cout << "Deletion ARGS: " << trash_list.at(i).getArgsList() << endl;
-        cout << "CWD when executed: " << trash_list.at(i).getExeDir() << endl;
-        if (trash_list.at(i).getDeprecated()) {
-            cout << "Current file location[in trash] - NOT EXISTS[Empty Trash bin from other process?]: " << trash_list.at(i).getTrashDir() << endl;
+        cout << "Deletion ARGS: " << i->second.getArgsList() << endl;
+        cout << "CWD when executed: " << i->second.getExeDir() << endl;
+        if (i->second.getDeprecated()) {
+            cout << "Current file location[in trash] - NOT EXISTS[Empty Trash bin from other process?]: " << i->second.getTrashDir() << endl;
         } else {
-            cout << "Current file location[in trash]: " << trash_list.at(i).getTrashDir() << endl;
+            cout << "Current file location[in trash]: " << i->second.getTrashDir() << endl;
         }
         cout << endl;
     }
@@ -109,7 +110,8 @@ void TrashManager::init_trashdata() {
     string buffer; // TEMP buffer
     while (getline(files_open, buffer)) {
         // parse its string.
-        trash_list.push_back(create_trashdata(split_string(buffer, '\t'))); // split string first, create trashdata, and push back.
+        vector<string> splited = split_string(buffer, '\t');
+        trash_list.insert(make_pair(splited.at(4), create_trashdata(splited)));
     }
 }
 
@@ -211,8 +213,8 @@ TrashManager::~TrashManager() {
         return;
     }
 
-    for (int i = 0; i < trash_list.size(); i++) {
-        write_open << trash_list.at(i).getDeletionTime() << "\t" << trash_list.at(i).getArgsList() << "\t" << trash_list.at(i).getExeDir() << "\t" << trash_list.at(i).getFileDir() << "\t" << trash_list.at(i).getTrashDir() << endl;
+    for (auto i = trash_list.begin(); i != trash_list.end(); i++) {
+        write_open << i->second.getDeletionTime() << "\t" << i->second.getArgsList() << "\t" << i->second.getExeDir() << "\t" << i->second.getFileDir() << "\t" << i->second.getTrashDir() << endl;
     }
 
     files_open.close();

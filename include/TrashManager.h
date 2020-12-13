@@ -2,6 +2,7 @@
 #include <fstream>
 #include <filesystem>
 #include <vector>
+#include <map>
 #include <unistd.h>
 
 #include "UserDefinition.h"
@@ -15,7 +16,7 @@ class TrashManager {
 private:
     ifstream files_open;
     ofstream write_open;
-    vector<TrashData> trash_list;
+    map<string, TrashData> trash_list;
     string args_list;
 
     string get_usr_name();
