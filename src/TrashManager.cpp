@@ -51,11 +51,13 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
 
 int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
     int is_show = 0;
+    int is_version = 0;
     struct option argument_list[] = {
         {"recursive", no_argument, &usr_de.is_recursive_delete, 1},
         {"force", no_argument, &usr_de.is_force, 1},
         {"verbose", no_argument, &usr_de.is_verbose, 1},
-        {"show", no_argument, &is_show, 1}
+        {"show", no_argument, &is_show, 1},
+        {"version", no_argument, &is_version, 1}
     };
     if (argc < 2) {
         cerr << "Needs at least one argument to delete some files!" << endl;
@@ -67,6 +69,7 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
      * -f --force : Force
      * -v --verbose : verbose
      * -s --show : show trash data -- even every flag set, it does not remove anything.
+     * --version : Show the version of this program.
      */
     char c;
     while ((c = getopt_long(argc, args, "rvfs", argument_list, NULL)) != -1) {
@@ -93,6 +96,13 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
     if (is_show) {
 show_infonow:
         this->show_trashinfo();
+        return 0;
+    }
+
+    if (is_version) {
+        cout << "KangDroid Trash Mover Ver. " << KDR_TRASH_MOVER_VER << endl;
+        cout << "Compiled with " << __VERSION__ << ",";
+        cout << " on: " << __DATE__ << ", " << __TIME__ << endl;
         return 0;
     }
     
