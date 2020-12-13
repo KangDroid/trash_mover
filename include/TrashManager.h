@@ -23,6 +23,7 @@ private:
     map<string, TrashData> trash_list;
     string args_list;
     vector<string> file_to_remove;
+    string trash_data_lists;
 
     string get_usr_name();
     string remove_newline(string& target);

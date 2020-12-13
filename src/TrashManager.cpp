@@ -370,7 +370,8 @@ void TrashManager::empty_trash() {
 }
 
 TrashManager::TrashManager() {
-    files_open.open("/usr/local/kangdroid/trash_lists");
+    trash_data_lists = "/usr/local/kangdroid/trash_lists";
+    files_open.open(trash_data_lists);
     if (!files_open.is_open()) {
         cerr << "Trash data open failed." << endl;
         return;
@@ -384,7 +385,7 @@ TrashManager::~TrashManager() {
         files_open.close();
     }
 
-    write_open.open("/usr/local/kangdroid/trash_lists", ios::trunc);
+    write_open.open(trash_data_lists, ios::trunc);
     if (!write_open.is_open()) {
         cerr << "Writing trash data open failed" << endl;
         return;
