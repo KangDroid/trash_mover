@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <unistd.h>
+#include <getopt.h>
 
 #include "UserDefinition.h"
 #include "TrashData.h"

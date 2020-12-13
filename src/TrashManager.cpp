@@ -50,19 +50,26 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
 }
 
 int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
+    int is_show = 0;
+    struct option argument_list[] = {
+        {"recursive", no_argument, &usr_de.is_recursive_delete, 1},
+        {"force", no_argument, &usr_de.is_force, 1},
+        {"verbose", no_argument, &usr_de.is_verbose, 1},
+        {"show", no_argument, &is_show, 1}
+    };
     if (argc < 2) {
         cerr << "Needs at least one argument to delete some files!" << endl;
         return -1;
     }
     /**
      * Supported Options
-     * -r : Recursive
-     * -f : Force
-     * -v : verbose
-     * -s : show trash data -- even every flag set, it does not remove anything.
+     * -r --recursive : Recursive
+     * -f --force : Force
+     * -v --verbose : verbose
+     * -s --show : show trash data -- even every flag set, it does not remove anything.
      */
     char c;
-    while ((c = getopt(argc, args, "rvfs")) != -1) {
+    while ((c = getopt_long(argc, args, "rvfs", argument_list, NULL)) != -1) {
         switch(c) {
             case 'r':
                 usr_de.is_recursive_delete = true;
@@ -74,14 +81,19 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
                 usr_de.is_verbose = true;
             break;
             case 's':
-                this->show_trashinfo();
-                return 0;
+                goto show_infonow;
             break;
             case '?':
                 cerr << "Unknown Argument" << endl;
                 return -1;
             break;
         }
+    }
+
+    if (is_show) {
+show_infonow:
+        this->show_trashinfo();
+        return 0;
     }
     
     // Parse
