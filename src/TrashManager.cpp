@@ -291,18 +291,16 @@ vector<string> TrashManager::split_string(string& input, char delim) {
  * After this call, program must exit therefore Destructor is called.
  */
 void TrashManager::remove_duplicated_data() {
-    for (auto i = trash_list.begin(); i != trash_list.end(); i++) {
+    /**
+     * After map.erase(i) called, i is no longer available because 
+     * the iterator i is being nullyfied[?] after erase call.
+     * Therefore, backup its iterator FIRST, and restore it after erase.
+     */
+    for (auto i = trash_list.begin(); i != trash_list.end();) {
         if (i->second.getDeprecated()) {
-            /**
-             * After map.erase(i) called, i is no longer available because 
-             * the iterator i is being nullyfied[?] after erase call.
-             * Therefore, backup its iterator FIRST, and restore it after erase.
-             */
-            auto backup_itr = i;
-            trash_list.erase(i);
-
-            // restore
-            i = backup_itr;
+            trash_list.erase(i++);
+        } else {
+            ++i;
         }
     }
 }
