@@ -4,9 +4,16 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
     for (int i = 0; i < file_to_remove.size(); i++) {
         filesystem::path target(file_to_remove.at(i));
         filesystem::path destination_target;
-        // Get username
-        string username_str = get_usr_name();
-        filesystem::path trash_path("/Users/"+username_str+"/.Trash");
+        filesystem::path trash_path;
+
+        if (!strcmp(DEFAULT_TRASH_LOCATION, IS_DYN)) {
+            // Get username
+            string username_str = get_usr_name();
+            // Determine Trash location dynamically.
+            trash_path = "/Users/"+username_str+"/.Trash";
+        } else {
+            trash_path = string(DEFAULT_TRASH_LOCATION);
+        }
 
         // Check if NO trash directory found.
         if (!filesystem::exists(trash_path)) {

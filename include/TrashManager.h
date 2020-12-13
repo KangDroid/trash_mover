@@ -3,11 +3,14 @@
 #include <filesystem>
 #include <vector>
 #include <map>
+#include <cstring>
+#include <cstdlib>
 #include <unistd.h>
 #include <getopt.h>
 
 #include "UserDefinition.h"
 #include "TrashData.h"
+#include "Configuration.h"
 
 #define USERNAME_LIMIT 1024
 

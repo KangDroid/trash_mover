@@ -11,6 +11,10 @@ set(TM_VERSION 1.0.0)
 
 set(CMAKE_CXX_FLAGS "-DKDR_TRASH_MOVER_VER=\"\\\"${TM_VERSION}\\\"\" -Wall -O3 -Wno-deprecated-declarations -Wno-unneeded-internal-declaration")
 
+if(DEFINED CUSTOM_TRASH_LOCATION)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEFAULT_TRASH_LOCATION=\"\\\"${CUSTOM_TRASH_LOCATION}\\\"\"")
+endif(DEFINED CUSTOM_TRASH_LOCATION)
+
 include_directories(${TrashMover_SOURCE_DIR}/include)
 
 add_executable(TrashMover src/main.cpp src/UserDefinition.cpp src/TrashManager.cpp src/TrashData.cpp)
