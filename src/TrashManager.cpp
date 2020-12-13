@@ -371,12 +371,17 @@ void TrashManager::empty_trash() {
 
 TrashManager::TrashManager() {
     
-    /**
-     * The thing: What if we need to use "sudo"?
-     * TODO: Relying username might not ideal if we need to use "sudo"
-     */
-    string usr_name = this->get_usr_name();
-    trash_data_lists = "/Users/" + usr_name + "/.trash_lists";
+    // Dynamic
+    if (!strcmp(DEFAULT_TRASH_DATA_LOCATION, IS_DYN)) {
+        /**
+         * The thing: What if we need to use "sudo"?
+         * TODO: Relying username might not ideal if we need to use "sudo"
+         */
+        string usr_name = this->get_usr_name();
+        trash_data_lists = "/Users/" + usr_name + "/.trash_lists";
+    } else {
+        trash_data_lists = string(DEFAULT_TRASH_DATA_LOCATION);
+    }
     files_open.open(trash_data_lists);
     if (!files_open.is_open()) {
         cerr << "Trash data open failed." << endl;

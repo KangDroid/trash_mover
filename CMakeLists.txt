@@ -15,6 +15,10 @@ if(DEFINED CUSTOM_TRASH_LOCATION)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEFAULT_TRASH_LOCATION=\"\\\"${CUSTOM_TRASH_LOCATION}\\\"\"")
 endif(DEFINED CUSTOM_TRASH_LOCATION)
 
+if(DEFINED CUSTOM_TRASHDATA_LOCATION)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEFAULT_TRASH_DATA_LOCATION=\"\\\"${CUSTOM_TRASHDATA_LOCATION}\\\"\"")
+endif(DEFINED CUSTOM_TRASHDATA_LOCATION)
+
 include_directories(${TrashMover_SOURCE_DIR}/include)
 
 add_executable(TrashMover src/main.cpp src/UserDefinition.cpp src/TrashManager.cpp src/TrashData.cpp)
