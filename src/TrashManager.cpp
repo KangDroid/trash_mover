@@ -60,13 +60,15 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
     int is_show = 0;
     int is_version = 0;
     int is_clear = 0;
+    int is_empty_trash = 0;
     struct option argument_list[] = {
         {"recursive", no_argument, &usr_de.is_recursive_delete, 1},
         {"force", no_argument, &usr_de.is_force, 1},
         {"verbose", no_argument, &usr_de.is_verbose, 1},
         {"show", no_argument, &is_show, 1},
         {"version", no_argument, &is_version, 1},
-        {"clear", no_argument, &is_clear, 1}
+        {"clear", no_argument, &is_clear, 1},
+        {"empty-trash", no_argument, &is_empty_trash, 1}
     };
     if (argc < 2) {
         cerr << "Needs at least one argument to delete some files!" << endl;
@@ -80,9 +82,10 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
      * -s --show : show trash data -- even every flag set, it does not remove anything.
      * --version : Show the version of this program.
      * -C --clear: Clear duplicated trash data
+     * -E --empty-trash : Empty[Permanently remove] trash using trashdata.
      */
     char c;
-    while ((c = getopt_long(argc, args, "Crvfs", argument_list, NULL)) != -1) {
+    while ((c = getopt_long(argc, args, "ECrvfs", argument_list, NULL)) != -1) {
         switch(c) {
             case 'r':
                 usr_de.is_recursive_delete = true;
@@ -98,6 +101,9 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
             break;
             case 'C':
                 goto clear_duplicated_data;
+            break;
+            case 'E':
+                goto empty_trash_now;
             break;
             case '?':
                 cerr << "Unknown Argument" << endl;
@@ -122,6 +128,12 @@ clear_duplicated_data:
         cout << "KangDroid Trash Mover Ver. " << KDR_TRASH_MOVER_VER << endl;
         cout << "Compiled with " << __VERSION__ << ",";
         cout << " on: " << __DATE__ << ", " << __TIME__ << endl;
+        return 0;
+    }
+
+    if (is_empty_trash) {
+empty_trash_now:
+        this->empty_trash();
         return 0;
     }
     
@@ -303,6 +315,53 @@ void TrashManager::remove_duplicated_data() {
 
             // restore
             i = backup_itr;
+        }
+    }
+}
+
+/**
+ * So this is actually BIG important, because we need to ask user for verification.
+ * Emptying trash means files are gonna permanently deleted!
+ */
+void TrashManager::empty_trash() {
+
+    /**
+     * INIT trash path
+     */
+    filesystem::path trash_path;
+    if (!strcmp(DEFAULT_TRASH_LOCATION, IS_DYN)) {
+        // Get username
+        string username_str = get_usr_name();
+        // Determine Trash location dynamically.
+        trash_path = "/Users/"+username_str+"/.Trash";
+    } else {
+        trash_path = string(DEFAULT_TRASH_LOCATION);
+    }
+
+    string remove_verification = "";
+    int counter = 0;
+    for (auto i = trash_list.begin(); i != trash_list.end(); i++) {
+        if (!i->second.getDeprecated()) {
+            counter++;
+            remove_verification += i->second.getTrashDir() + "\n";
+        }
+    }
+
+    string really;
+    cout << "Are you really sure to empty trashcan[" << trash_path.string() << "]?" << endl;
+    cout << "Confirm these files are removed from trashcan!" << endl;
+    cout << remove_verification << endl;
+    cout << "Confirm?[y/n] : ";
+    getline(cin, really);
+    if (really != "y" && really != "yes") {
+        cout << "Abort." << endl;
+        return;
+    }
+
+    // remove process goes on.
+    for (auto i = trash_list.begin(); i != trash_list.end(); i++) {
+        if (!i->second.getDeprecated()) {
+            filesystem::remove_all(i->second.getTrashDir());
         }
     }
 }
