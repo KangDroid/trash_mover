@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
             break;
             case '?':
                 cerr << "Unknown Argument" << endl;
+                return -1;
             break;
         }
     }
