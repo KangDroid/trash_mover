@@ -59,12 +59,14 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
 int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
     int is_show = 0;
     int is_version = 0;
+    int is_clear = 0;
     struct option argument_list[] = {
         {"recursive", no_argument, &usr_de.is_recursive_delete, 1},
         {"force", no_argument, &usr_de.is_force, 1},
         {"verbose", no_argument, &usr_de.is_verbose, 1},
         {"show", no_argument, &is_show, 1},
-        {"version", no_argument, &is_version, 1}
+        {"version", no_argument, &is_version, 1},
+        {"clear", no_argument, &is_clear, 1}
     };
     if (argc < 2) {
         cerr << "Needs at least one argument to delete some files!" << endl;
@@ -77,9 +79,10 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
      * -v --verbose : verbose
      * -s --show : show trash data -- even every flag set, it does not remove anything.
      * --version : Show the version of this program.
+     * -C --clear: Clear duplicated trash data
      */
     char c;
-    while ((c = getopt_long(argc, args, "rvfs", argument_list, NULL)) != -1) {
+    while ((c = getopt_long(argc, args, "Crvfs", argument_list, NULL)) != -1) {
         switch(c) {
             case 'r':
                 usr_de.is_recursive_delete = true;
@@ -93,6 +96,9 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
             case 's':
                 goto show_infonow;
             break;
+            case 'C':
+                goto clear_duplicated_data;
+            break;
             case '?':
                 cerr << "Unknown Argument" << endl;
                 return -1;
@@ -103,6 +109,12 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
     if (is_show) {
 show_infonow:
         this->show_trashinfo();
+        return 0;
+    }
+
+    if (is_clear) {
+clear_duplicated_data:
+        this->remove_duplicated_data();
         return 0;
     }
 
@@ -273,6 +285,26 @@ vector<string> TrashManager::split_string(string& input, char delim) {
     }
 
     return ret_val;
+}
+
+/**
+ * After this call, program must exit therefore Destructor is called.
+ */
+void TrashManager::remove_duplicated_data() {
+    for (auto i = trash_list.begin(); i != trash_list.end(); i++) {
+        if (i->second.getDeprecated()) {
+            /**
+             * After map.erase(i) called, i is no longer available because 
+             * the iterator i is being nullyfied[?] after erase call.
+             * Therefore, backup its iterator FIRST, and restore it after erase.
+             */
+            auto backup_itr = i;
+            trash_list.erase(i);
+
+            // restore
+            i = backup_itr;
+        }
+    }
 }
 
 TrashManager::TrashManager() {

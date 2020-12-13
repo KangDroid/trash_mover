@@ -31,6 +31,7 @@ private:
     TrashData create_trashdata(vector<string> lists);
     TrashData create_trashdata(filesystem::path abstarget, filesystem::path trashdir);
     vector<string> split_string(string& input, char delim);
+    void remove_duplicated_data();
 public:
     TrashManager();
     ~TrashManager();
