@@ -414,7 +414,7 @@ TrashManager::TrashManager() {
     if (!filesystem::exists(trash_path)) {
         cerr << "No such file or directory: " << trash_path.string() << endl;
         cerr << "Contact Developer with log" << endl;
-        return;
+        exit(-1);
     }
 
     // Dynamic
@@ -431,7 +431,7 @@ TrashManager::TrashManager() {
     files_open.open(trash_data_lists);
     if (!files_open.is_open()) {
         cerr << "Trash data open failed." << endl;
-        return;
+        exit(-1);
     }
 
     init_trashdata();
