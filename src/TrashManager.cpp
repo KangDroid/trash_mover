@@ -321,11 +321,11 @@ vector<string> TrashManager::split_string(string& input, char delim) {
  * After this call, program must exit therefore Destructor is called.
  */
 void TrashManager::remove_duplicated_data() {
-    for (int i = 0; i < trash_list.size(); i++) {
-        if (trash_list.at(i).getDeprecated()) {
-            trash_list.erase(trash_list.begin() + i);
-        }
-    }
+    auto end_val = remove_if(trash_list.begin(), trash_list.end(), [](TrashData trd) {
+        return trd.getDeprecated();
+    });
+
+    trash_list.erase(end_val, trash_list.end());
 }
 
 /**
