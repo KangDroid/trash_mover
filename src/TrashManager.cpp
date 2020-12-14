@@ -68,7 +68,8 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
         {"show", no_argument, &is_show, 1},
         {"version", no_argument, &is_version, 1},
         {"clear", no_argument, &is_clear, 1},
-        {"empty-trash", no_argument, &is_empty_trash, 1}
+        {"empty-trash", no_argument, &is_empty_trash, 1},
+        {0}
     };
     if (argc < 2) {
         cerr << "Needs at least one argument to delete some files!" << endl;
