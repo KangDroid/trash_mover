@@ -528,6 +528,7 @@ string TrashManager::get_usr_name() {
     char* username_arr = new char[USERNAME_LIMIT];
     if (getlogin_r(username_arr, USERNAME_LIMIT) != 0) {
         perror("Error occured when getting username");
+        exit(-1);
     }
     string ret_val = string(username_arr);
     delete[] username_arr;
