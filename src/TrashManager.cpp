@@ -163,6 +163,10 @@ show_help_now:
         } else {
             string path_tmp = string(args[i]);
             filesystem::path current_path(path_tmp);
+            if (current_path == trash_data_lists) {
+                cout << "Warning: you are erasing trash data, so program will not write information for this time." << endl;
+                write_trashdata = false;
+            }
             if (!filesystem::exists(current_path)) {
                 cerr << "Path: " << current_path << " does not exists!" << endl;
                 return -1;
@@ -504,6 +508,8 @@ TrashManager::TrashManager() {
         exit(-1);
     }
 
+    write_trashdata = true;
+
     init_trashdata();
 }
 
@@ -512,14 +518,16 @@ TrashManager::~TrashManager() {
         files_open.close();
     }
 
-    write_open.open(trash_data_lists, ios::trunc);
-    if (!write_open.is_open()) {
-        cerr << "Writing trash data open failed" << endl;
-        return;
-    }
+    if (write_trashdata) {
+        write_open.open(trash_data_lists, ios::trunc);
+        if (!write_open.is_open()) {
+            cerr << "Writing trash data open failed" << endl;
+            return;
+        }
 
-    for (TrashData& trd : trash_list) {
-        write_open << trd.getDeletionTime() << "\t" << trd.getArgsList() << "\t" << trd.getExeDir() << "\t" << trd.getFileDir() << "\t" << trd.getTrashDir() << endl;
+        for (TrashData& trd : trash_list) {
+            write_open << trd.getDeletionTime() << "\t" << trd.getArgsList() << "\t" << trd.getExeDir() << "\t" << trd.getFileDir() << "\t" << trd.getTrashDir() << endl;
+        }
     }
 
     files_open.close();
