@@ -9,7 +9,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 set(TM_VERSION 1.0.0)
 
-set(CMAKE_CXX_FLAGS "-DKDR_TRASH_MOVER_VER=\"\\\"${TM_VERSION}\\\"\" -Wall -O3 -Wno-deprecated-declarations -Wno-unneeded-internal-declaration")
+execute_process(COMMAND git rev-parse --short HEAD OUTPUT_VARIABLE LATEST_COMMIT)
+string(REGEX REPLACE "\n$" "" LATEST_COMMIT "${LATEST_COMMIT}")
+
+set(CMAKE_CXX_FLAGS "-DKDR_TRASH_MOVER_VER=\"\\\"${TM_VERSION}\\\"\" -DKDR_LATEST_COMMIT=\"\\\"${LATEST_COMMIT}\\\"\" -Wall -O3 -Wno-deprecated-declarations -Wno-unneeded-internal-declaration")
 
 if(DEFINED CUSTOM_TRASH_LOCATION)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEFAULT_TRASH_LOCATION=\"\\\"${CUSTOM_TRASH_LOCATION}\\\"\"")

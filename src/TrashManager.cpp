@@ -465,7 +465,7 @@ void TrashManager::print_help(string prog_name) {
 }
 
 void TrashManager::print_version() {
-    cout << "KangDroid Trash Mover Ver. " << KDR_TRASH_MOVER_VER << endl;
+    cout << "KangDroid Trash Mover Ver. " << KDR_TRASH_MOVER_VER << "[" << KDR_LATEST_COMMIT << "]" <<endl;
     cout << "Compiled with " << __VERSION__ << ",";
     cout << " on: " << __DATE__ << ", " << __TIME__ << endl;
 }
