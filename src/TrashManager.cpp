@@ -26,7 +26,7 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.is_recursive_delete) {
             cerr << "Recursive -r option is not specified, but folder is found." << endl;
             cerr << "Omitting directory: " << target << endl;
-            return;
+            continue;
         }
 
         // Default Target directory
@@ -45,7 +45,7 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
             getline(cin, really);
             if (really != "y" && really != "yes") {
                 cout << "Abort." << endl;
-                return;
+                continue;
             }
         }
 
@@ -68,7 +68,8 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
         {"show", no_argument, &is_show, 1},
         {"version", no_argument, &is_version, 1},
         {"clear", no_argument, &is_clear, 1},
-        {"empty-trash", no_argument, &is_empty_trash, 1}
+        {"empty-trash", no_argument, &is_empty_trash, 1},
+        {0}
     };
     if (argc < 2) {
         cerr << "Needs at least one argument to delete some files!" << endl;
