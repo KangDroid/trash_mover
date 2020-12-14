@@ -4,23 +4,6 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
     for (int i = 0; i < file_to_remove.size(); i++) {
         filesystem::path target(file_to_remove.at(i));
         filesystem::path destination_target;
-        filesystem::path trash_path;
-
-        if (!strcmp(DEFAULT_TRASH_LOCATION, IS_DYN)) {
-            // Get username
-            string username_str = get_usr_name();
-            // Determine Trash location dynamically.
-            trash_path = "/Users/"+username_str+"/.Trash";
-        } else {
-            trash_path = string(DEFAULT_TRASH_LOCATION);
-        }
-
-        // Check if NO trash directory found.
-        if (!filesystem::exists(trash_path)) {
-            cerr << "No such file or directory: " << trash_path.string() << endl;
-            cerr << "Contact Developer with log" << endl;
-            return;
-        }
 
         // Return when type is folder, but -r option is not specified.
         if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.is_recursive_delete) {
@@ -349,20 +332,6 @@ void TrashManager::remove_duplicated_data() {
  * Emptying trash means files are gonna permanently deleted!
  */
 void TrashManager::empty_trash() {
-
-    /**
-     * INIT trash path
-     */
-    filesystem::path trash_path;
-    if (!strcmp(DEFAULT_TRASH_LOCATION, IS_DYN)) {
-        // Get username
-        string username_str = get_usr_name();
-        // Determine Trash location dynamically.
-        trash_path = "/Users/"+username_str+"/.Trash";
-    } else {
-        trash_path = string(DEFAULT_TRASH_LOCATION);
-    }
-
     string remove_verification = "";
     int counter = 0;
     for (TrashData& trd : trash_list) {
@@ -431,7 +400,22 @@ void TrashManager::restore_file(TrashData& trd) {
 }
 
 TrashManager::TrashManager() {
-    
+    if (!strcmp(DEFAULT_TRASH_LOCATION, IS_DYN)) {
+        // Get username
+        string username_str = get_usr_name();
+        // Determine Trash location dynamically.
+        trash_path = "/Users/"+username_str+"/.Trash";
+    } else {
+        trash_path = string(DEFAULT_TRASH_LOCATION);
+    }
+
+    // Check if NO trash directory found.
+    if (!filesystem::exists(trash_path)) {
+        cerr << "No such file or directory: " << trash_path.string() << endl;
+        cerr << "Contact Developer with log" << endl;
+        return;
+    }
+
     // Dynamic
     if (!strcmp(DEFAULT_TRASH_DATA_LOCATION, IS_DYN)) {
         /**
