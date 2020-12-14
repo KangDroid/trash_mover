@@ -502,6 +502,12 @@ TrashManager::TrashManager() {
     } else {
         trash_data_lists = string(DEFAULT_TRASH_DATA_LOCATION);
     }
+
+    if (!filesystem::exists(trash_data_lists) && filesystem::exists(filesystem::path(trash_data_lists).parent_path())) {
+        cout << "Trash data is not found on" << trash_data_lists << ". Creating new one.." << endl;
+        ofstream tmp_ofs(trash_data_lists);
+        tmp_ofs.close();
+    }
     files_open.open(trash_data_lists);
     if (!files_open.is_open()) {
         cerr << "Trash data open failed." << endl;
