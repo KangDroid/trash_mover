@@ -45,6 +45,7 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
     int is_clear = 0;
     int is_empty_trash = 0;
     int is_restore = 0;
+    int is_help = 0;
     struct option argument_list[] = {
         {"recursive", no_argument, &usr_de.is_recursive_delete, 1},
         {"force", no_argument, &usr_de.is_force, 1},
@@ -54,6 +55,7 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
         {"clear", no_argument, &is_clear, 1},
         {"empty-trash", no_argument, &is_empty_trash, 1},
         {"restore", no_argument, &is_restore, 1},
+        {"help", no_argument, &is_help, 1},
         {0}
     };
     if (argc < 2) {
@@ -69,6 +71,7 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
      * --version : Show the version of this program.
      * -C --clear: Clear duplicated trash data
      * -E --empty-trash : Empty[Permanently remove] trash using trashdata.
+     * -h --help : Print help
      */
     char c;
     while ((c = getopt_long(argc, args, "RECrvfs", argument_list, NULL)) != -1) {
@@ -93,6 +96,9 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
             break;
             case 'R':
                 goto restore_trash_now;
+            break;
+            case 'h':
+                goto show_help_now;
             break;
             case '?':
                 cerr << "Unknown Argument" << endl;
@@ -129,6 +135,12 @@ empty_trash_now:
     if (is_restore) {
 restore_trash_now:
         this->open_trashrestore();
+        return 0;
+    }
+
+    if (is_help) {
+show_help_now:
+        this->print_help((string(args[0])));
         return 0;
     }
     
@@ -398,6 +410,41 @@ void TrashManager::restore_file(TrashData& trd) {
     // restore!
     filesystem::rename(trd.getTrashDir(), trd.getFileDir());
     cout << "File restored from " << trd.getTrashDir() << " to " << trd.getFileDir() << "." << endl;
+}
+
+void TrashManager::print_help(string prog_name) {
+    cout << "Usage: " << prog_name << " $OPTIONS $FILES" << endl;
+    cout << "Move specified files to trash[" << trash_path.string() << "]!" << endl << endl;
+
+    cout << "Supported Options:" << endl;
+    cout << "-r, --recursive:\tRecursive-Delete on target $FILES." << endl;
+    cout << "-f, --force:\tForce Remove[without prompting]." << endl;
+    cout << "-v, --verbose:\tVerbose Delete." << endl;
+    cout << "-s, --show:\tShow current trash data in lists, including trash path." << endl;
+    cout << "--version:\tShow version of this program." << endl;
+    cout << "-C, --clear:\tClear duplicated trash data." << endl;
+    cout << "-E, --empty-trash:\tEmpty Trashcan based on trashdata lists[Cannot be undone!]" << endl;
+    cout << "-h, --help:\tPrint this help!" << endl << endl;
+    cout << "-R, --restore:\tPrompt Restore menu[based on trashdata]" << endl;
+
+    cout << "By default, this program will NOT delete folders[recursive = nope]" << endl;
+    cout << "and always ask each files to be deleted." << endl;
+    cout << "If you want to remove a lot of files/folders, you might want to use -r/-f together" << endl;
+    cout << "Example: " << prog_name << " -rf $TARGET_DIRECTORY" << endl;
+    cout << endl;
+
+    cout << "For Trash Data:" << endl;
+    cout << "Trashdata stores information such as, Deletion time, Deleted[original] path, Actual location on trashcan" << endl;
+    cout << "This is something kind of metadata of trashcan, thus we can restore its contents from those data, using -R/--restore options." << endl;
+    cout << endl;
+
+    cout << "Note: If you remove trashdata, the deleted files are still in trashcan, but you cannot restore files using our menu.[-R/--restore]" << endl;
+
+    cout <<endl;
+
+    cout << "KangDroid Trash Mover Ver. " << KDR_TRASH_MOVER_VER << endl;
+    cout << "Compiled with " << __VERSION__ << ",";
+    cout << " on: " << __DATE__ << ", " << __TIME__ << endl;
 }
 
 TrashManager::TrashManager() {

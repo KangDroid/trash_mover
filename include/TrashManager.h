@@ -37,6 +37,7 @@ private:
     void empty_trash();
     void check_same_push(TrashData itrd);
     void restore_file(TrashData& trd);
+    void print_help(string prog_name);
 public:
     TrashManager();
     ~TrashManager();
