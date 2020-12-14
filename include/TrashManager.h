@@ -35,10 +35,12 @@ private:
     void remove_duplicated_data();
     void empty_trash();
     void check_same_push(TrashData itrd);
+    void restore_file(TrashData& trd);
 public:
     TrashManager();
     ~TrashManager();
     void move_to_trash(UserDefinition& udf);
     int setargs(int argc, char** args, UserDefinition& usr_de);
     void show_trashinfo();
+    void open_trashrestore();
 };

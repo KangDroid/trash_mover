@@ -61,6 +61,7 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
     int is_version = 0;
     int is_clear = 0;
     int is_empty_trash = 0;
+    int is_restore = 0;
     struct option argument_list[] = {
         {"recursive", no_argument, &usr_de.is_recursive_delete, 1},
         {"force", no_argument, &usr_de.is_force, 1},
@@ -69,6 +70,7 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
         {"version", no_argument, &is_version, 1},
         {"clear", no_argument, &is_clear, 1},
         {"empty-trash", no_argument, &is_empty_trash, 1},
+        {"restore", no_argument, &is_restore, 1},
         {0}
     };
     if (argc < 2) {
@@ -86,7 +88,7 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
      * -E --empty-trash : Empty[Permanently remove] trash using trashdata.
      */
     char c;
-    while ((c = getopt_long(argc, args, "ECrvfs", argument_list, NULL)) != -1) {
+    while ((c = getopt_long(argc, args, "RECrvfs", argument_list, NULL)) != -1) {
         switch(c) {
             case 'r':
                 usr_de.is_recursive_delete = true;
@@ -105,6 +107,9 @@ int TrashManager::setargs(int argc, char** args, UserDefinition& usr_de) {
             break;
             case 'E':
                 goto empty_trash_now;
+            break;
+            case 'R':
+                goto restore_trash_now;
             break;
             case '?':
                 cerr << "Unknown Argument" << endl;
@@ -135,6 +140,12 @@ clear_duplicated_data:
     if (is_empty_trash) {
 empty_trash_now:
         this->empty_trash();
+        return 0;
+    }
+
+    if (is_restore) {
+restore_trash_now:
+        this->open_trashrestore();
         return 0;
     }
     
@@ -184,6 +195,29 @@ void TrashManager::show_trashinfo() {
         cout << endl;
         counter++;
     }
+}
+
+void TrashManager::open_trashrestore() {
+    int idx_input;
+    
+    cout << "Restore Menu: " << endl;
+    this->show_trashinfo();
+
+    cout << "Enter file index number to restore! : ";
+    cin >> idx_input;
+
+    if (idx_input < 1 || idx_input > trash_list.size()) {
+        cout << "Wrong input. Input range is: 1 ~ " << trash_list.size() << "." << endl;
+
+        // do nothing and exit.
+        return;
+    }
+
+    // The real index on vector array.
+    idx_input--;
+
+    // restore!
+    restore_file(trash_list.at(idx_input));
 }
 
 /**
@@ -372,6 +406,28 @@ void TrashManager::check_same_push(TrashData itrd) {
 
     // If this state is reached, that means there is no same entries.
     trash_list.push_back(itrd);
+}
+
+/**
+ * Restore file with argument trd.
+ * 
+ * This function will check existance in original location,
+ * and it will restore it!
+ * 
+ * Shell - command would be:
+ * mv $TRASH_LOCATION_FILE $ORIGINAL_LOCATOIN
+ */
+void TrashManager::restore_file(TrashData& trd) {
+    if (filesystem::exists(trd.getFileDir())) {
+        cerr << "Tried to restore file: " << trd.getFileDir() << " on " << trd.getTrashDir() << "," << endl;
+        cerr << "But a file already exists on " << trd.getFileDir() << "." << endl;
+        cerr << "Aborting.." << endl;
+        return;
+    }
+
+    // restore!
+    filesystem::rename(trd.getTrashDir(), trd.getFileDir());
+    cout << "File restored from " << trd.getTrashDir() << " to " << trd.getFileDir() << "." << endl;
 }
 
 TrashManager::TrashManager() {
