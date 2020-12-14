@@ -120,9 +120,7 @@ clear_duplicated_data:
     }
 
     if (is_version) {
-        cout << "KangDroid Trash Mover Ver. " << KDR_TRASH_MOVER_VER << endl;
-        cout << "Compiled with " << __VERSION__ << ",";
-        cout << " on: " << __DATE__ << ", " << __TIME__ << endl;
+        this->print_version();
         return 0;
     }
 
@@ -442,6 +440,10 @@ void TrashManager::print_help(string prog_name) {
 
     cout <<endl;
 
+    this->print_version();
+}
+
+void TrashManager::print_version() {
     cout << "KangDroid Trash Mover Ver. " << KDR_TRASH_MOVER_VER << endl;
     cout << "Compiled with " << __VERSION__ << ",";
     cout << " on: " << __DATE__ << ", " << __TIME__ << endl;
