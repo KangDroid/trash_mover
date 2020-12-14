@@ -35,7 +35,14 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         // Append some information just before delete.
         check_same_push(create_trashdata(filesystem::absolute(target), destination_target));
         // move to trash!
-        filesystem::rename(filesystem::absolute(target), destination_target);
+        try {
+            filesystem::rename(filesystem::absolute(target), destination_target);
+        } catch (exception& e) {
+            // Handle if error occured.
+            cerr << "Error Occured when moving " << filesystem::absolute(target).string() << " to " << destination_target.string() << endl;
+            cerr << endl;
+            cerr << e.what() << endl;
+        }
     }
 }
 
@@ -371,7 +378,13 @@ void TrashManager::empty_trash() {
     // remove process goes on.
     for (TrashData& trd : trash_list) {
         if (!trd.getDeprecated()) {
-            filesystem::remove_all(trd.getTrashDir());
+            try {
+                filesystem::remove_all(trd.getTrashDir());
+            } catch (exception& e) {
+                cerr << "Error Occured when completely removing: " << trd.getTrashDir() << endl;
+                cerr << endl;
+                cerr << e.what() << endl;
+            }
         }
     }
 }
@@ -406,7 +419,15 @@ void TrashManager::restore_file(TrashData& trd) {
     }
 
     // restore!
-    filesystem::rename(trd.getTrashDir(), trd.getFileDir());
+    try {
+        filesystem::rename(trd.getTrashDir(), trd.getFileDir());
+    } catch (exception& e){
+        // Handle if error occured.
+        cerr << "Error Occured when moving " << trd.getTrashDir() << " to " << trd.getFileDir() << endl;
+        cerr << endl;
+        cerr << e.what() << endl;
+        return;
+    }
     cout << "File restored from " << trd.getTrashDir() << " to " << trd.getFileDir() << "." << endl;
 }
 
