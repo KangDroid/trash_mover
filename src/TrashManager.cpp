@@ -26,7 +26,7 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.is_recursive_delete) {
             cerr << "Recursive -r option is not specified, but folder is found." << endl;
             cerr << "Omitting directory: " << target << endl;
-            return;
+            continue;
         }
 
         // Default Target directory
