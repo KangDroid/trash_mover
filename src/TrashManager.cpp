@@ -528,9 +528,8 @@ TrashManager::~TrashManager() {
         for (TrashData& trd : trash_list) {
             write_open << trd.getDeletionTime() << "\t" << trd.getArgsList() << "\t" << trd.getExeDir() << "\t" << trd.getFileDir() << "\t" << trd.getTrashDir() << endl;
         }
+        write_open.close();
     }
-
-    files_open.close();
 }
 
 /**
