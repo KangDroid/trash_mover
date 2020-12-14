@@ -45,7 +45,7 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
             getline(cin, really);
             if (really != "y" && really != "yes") {
                 cout << "Abort." << endl;
-                return;
+                continue;
             }
         }
 
