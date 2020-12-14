@@ -161,6 +161,7 @@ restore_trash_now:
 
 void TrashManager::show_trashinfo() {
     int counter = 0;
+    cout << "Trash Location: " << trash_path.string() << endl << endl;;
     for (TrashData& trd : trash_list) {
         time_t del_time = trd.getDeletionTime();
         string tim_str = string(ctime(&del_time));
