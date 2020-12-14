@@ -20,7 +20,7 @@ class TrashManager {
 private:
     ifstream files_open;
     ofstream write_open;
-    map<string, TrashData> trash_list;
+    vector<TrashData> trash_list;
     string args_list;
     vector<string> file_to_remove;
     string trash_data_lists;
@@ -34,6 +34,7 @@ private:
     vector<string> split_string(string& input, char delim);
     void remove_duplicated_data();
     void empty_trash();
+    void check_same_push(TrashData itrd);
 public:
     TrashManager();
     ~TrashManager();

@@ -50,7 +50,7 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         }
 
         // Append some information just before delete.
-        trash_list.insert(make_pair(filesystem::absolute(destination_target), create_trashdata(filesystem::absolute(target), destination_target)));
+        check_same_push(create_trashdata(filesystem::absolute(target), destination_target));
         // move to trash!
         filesystem::rename(filesystem::absolute(target), destination_target);
     }
@@ -166,21 +166,22 @@ empty_trash_now:
 
 void TrashManager::show_trashinfo() {
     int counter = 0;
-    for (auto i = trash_list.begin(); i != trash_list.end(); i++,counter++) {
-        time_t del_time = i->second.getDeletionTime();
+    for (TrashData& trd : trash_list) {
+        time_t del_time = trd.getDeletionTime();
         string tim_str = string(ctime(&del_time));
         tim_str = remove_newline(tim_str);
         cout << "File " << counter + 1 << ":" << endl;
-        cout << "Original FileDirectory[before delete]: " << i->second.getFileDir() << endl;
+        cout << "Original FileDirectory[before delete]: " << trd.getFileDir() << endl;
         cout << "Deletion Time: " << tim_str << endl;
-        cout << "Deletion ARGS: " << i->second.getArgsList() << endl;
-        cout << "CWD when executed: " << i->second.getExeDir() << endl;
-        if (i->second.getDeprecated()) {
-            cout << "Current file location[in trash] - NOT EXISTS[Empty Trash bin from other process?]: " << i->second.getTrashDir() << endl;
+        cout << "Deletion ARGS: " << trd.getArgsList() << endl;
+        cout << "CWD when executed: " << trd.getExeDir() << endl;
+        if (trd.getDeprecated()) {
+            cout << "Current file location[in trash] - NOT EXISTS[Empty Trash bin from other process?]: " << trd.getTrashDir() << endl;
         } else {
-            cout << "Current file location[in trash]: " << i->second.getTrashDir() << endl;
+            cout << "Current file location[in trash]: " << trd.getTrashDir() << endl;
         }
         cout << endl;
+        counter++;
     }
 }
 
@@ -216,9 +217,7 @@ void TrashManager::init_trashdata() {
     }
     string buffer; // TEMP buffer
     while (getline(files_open, buffer)) {
-        // parse its string.
-        vector<string> splited = split_string(buffer, '\t');
-        trash_list.insert(make_pair(splited.at(4), create_trashdata(splited)));
+        check_same_push(create_trashdata(split_string(buffer, '\t')));
     }
 }
 
@@ -303,16 +302,9 @@ vector<string> TrashManager::split_string(string& input, char delim) {
  * After this call, program must exit therefore Destructor is called.
  */
 void TrashManager::remove_duplicated_data() {
-    /**
-     * After map.erase(i) called, i is no longer available because 
-     * the iterator i is being nullyfied[?] after erase call.
-     * Therefore, backup its iterator FIRST, and restore it after erase.
-     */
-    for (auto i = trash_list.begin(); i != trash_list.end();) {
-        if (i->second.getDeprecated()) {
-            trash_list.erase(i++);
-        } else {
-            ++i;
+    for (int i = 0; i < trash_list.size(); i++) {
+        if (trash_list.at(i).getDeprecated()) {
+            trash_list.erase(trash_list.begin() + i);
         }
     }
 }
@@ -338,10 +330,10 @@ void TrashManager::empty_trash() {
 
     string remove_verification = "";
     int counter = 0;
-    for (auto i = trash_list.begin(); i != trash_list.end(); i++) {
-        if (!i->second.getDeprecated()) {
+    for (TrashData& trd : trash_list) {
+        if (!trd.getDeprecated()) {
             counter++;
-            remove_verification += i->second.getTrashDir() + "\n";
+            remove_verification += trd.getTrashDir() + "\n";
         }
     }
 
@@ -362,11 +354,23 @@ void TrashManager::empty_trash() {
     }
 
     // remove process goes on.
-    for (auto i = trash_list.begin(); i != trash_list.end(); i++) {
-        if (!i->second.getDeprecated()) {
-            filesystem::remove_all(i->second.getTrashDir());
+    for (TrashData& trd : trash_list) {
+        if (!trd.getDeprecated()) {
+            filesystem::remove_all(trd.getTrashDir());
         }
     }
+}
+
+void TrashManager::check_same_push(TrashData itrd) {
+    // Check any same entry on trash list.
+    for (TrashData& trd : trash_list) {
+        if (trd.getTrashDir() == itrd.getTrashDir()) {
+            return;
+        }
+    }
+
+    // If this state is reached, that means there is no same entries.
+    trash_list.push_back(itrd);
 }
 
 TrashManager::TrashManager() {
@@ -402,8 +406,8 @@ TrashManager::~TrashManager() {
         return;
     }
 
-    for (auto i = trash_list.begin(); i != trash_list.end(); i++) {
-        write_open << i->second.getDeletionTime() << "\t" << i->second.getArgsList() << "\t" << i->second.getExeDir() << "\t" << i->second.getFileDir() << "\t" << i->second.getTrashDir() << endl;
+    for (TrashData& trd : trash_list) {
+        write_open << trd.getDeletionTime() << "\t" << trd.getArgsList() << "\t" << trd.getExeDir() << "\t" << trd.getFileDir() << "\t" << trd.getTrashDir() << endl;
     }
 
     files_open.close();
