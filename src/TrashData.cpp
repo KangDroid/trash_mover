@@ -3,10 +3,6 @@ time_t TrashData::getDeletionTime() {
     return this->deletion_time;
 }
 
-string TrashData::getArgsList() {
-    return this->args_list;
-}
-
 string TrashData::getExeDir() {
     return this->execution_directory;
 }
@@ -25,10 +21,6 @@ bool TrashData::getDeprecated() {
 
 void TrashData::setDeletionTime(time_t timeval) {
     this->deletion_time = timeval;
-}
-
-void TrashData::setArgsList(string arg_list) {
-    this->args_list = arg_list;
 }
 
 void TrashData::setExeDir(string exdir) {

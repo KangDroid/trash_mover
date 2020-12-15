@@ -17,7 +17,6 @@ using namespace std;
 class TrashData {
 private:
     time_t deletion_time; // When does it deleted?
-    string args_list; // What was the argument to delete when file was deleted?
     string execution_directory; // Where was the binary-execution directory?
     string file_directory; // Original Full file directory
     string trash_directory; // Trash location
@@ -26,7 +25,6 @@ private:
 public:
     // Getter
     time_t getDeletionTime();
-    string getArgsList();
     string getExeDir();
     string getFileDir();
     string getTrashDir();
@@ -34,7 +32,6 @@ public:
 
     // Setter
     void setDeletionTime(time_t timeval);
-    void setArgsList(string arg_list);
     void setExeDir(string exdir);
     void setFileDir(string filddir);
     void setTrashDir(string trashdir);

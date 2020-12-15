@@ -190,7 +190,6 @@ void TrashManager::show_trashinfo() {
         cout << "File " << counter + 1 << ":" << endl;
         cout << "Original FileDirectory[before delete]: " << trd.getFileDir() << endl;
         cout << "Deletion Time: " << tim_str << endl;
-        cout << "Deletion ARGS: " << trd.getArgsList() << endl;
         cout << "CWD when executed: " << trd.getExeDir() << endl;
         if (trd.getDeprecated()) {
             cout << "Current file location[in trash] - NOT EXISTS[Empty Trash bin from other process?]: " << trd.getTrashDir() << endl;
@@ -271,10 +270,9 @@ void TrashManager::init_trashdata() {
 TrashData TrashManager::create_trashdata(vector<string> lists) {
     TrashData trash_data;
     trash_data.setDeletionTime(stoi(lists.at(0)));
-    trash_data.setArgsList(lists.at(1));
-    trash_data.setExeDir(lists.at(2));
-    trash_data.setFileDir(lists.at(3));
-    trash_data.setTrashDir(lists.at(4));
+    trash_data.setExeDir(lists.at(1));
+    trash_data.setFileDir(lists.at(2));
+    trash_data.setTrashDir(lists.at(3));
 
     /**
      * Since FILE does not exists in trash can,
@@ -300,7 +298,6 @@ TrashData TrashManager::create_trashdata(vector<string> lists) {
 TrashData TrashManager::create_trashdata(filesystem::path abstarget, filesystem::path trashdir) {
     TrashData trash_data;
     trash_data.setDeletionTime(time(NULL));
-    trash_data.setArgsList(args_list);
     trash_data.setExeDir(cwd_string);
     trash_data.setFileDir(abstarget.string());
     trash_data.setTrashDir(trashdir.string());
@@ -535,7 +532,7 @@ TrashManager::~TrashManager() {
         }
 
         for (TrashData& trd : trash_list) {
-            write_open << trd.getDeletionTime() << "\t" << trd.getArgsList() << "\t" << trd.getExeDir() << "\t" << trd.getFileDir() << "\t" << trd.getTrashDir() << endl;
+            write_open << trd.getDeletionTime() << "\t" << trd.getExeDir() << "\t" << trd.getFileDir() << "\t" << trd.getTrashDir() << endl;
         }
         write_open.close();
     }
