@@ -385,18 +385,6 @@ void TrashManager::empty_trash() {
     }
 }
 
-void TrashManager::check_same_push(TrashData itrd) {
-    // Check any same entry on trash list.
-    for (TrashData& trd : trash_list) {
-        if (trd.getTrashDir() == itrd.getTrashDir()) {
-            return;
-        }
-    }
-
-    // If this state is reached, that means there is no same entries.
-    trash_list.push_back(itrd);
-}
-
 /**
  * Restore file with argument trd.
  * 
