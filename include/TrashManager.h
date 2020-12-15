@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
+#include <unordered_map>
 #include <unistd.h>
 #include <getopt.h>
 
@@ -27,6 +28,7 @@ private:
     string trash_data_lists;
     filesystem::path trash_path;
     bool write_trashdata;
+    unordered_map<string, filesystem::path> trashcan_lists;
 
     string get_usr_name();
     string remove_newline(string& target);

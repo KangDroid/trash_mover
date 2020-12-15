@@ -231,14 +231,12 @@ void TrashManager::open_trashrestore() {
  * return: edited path
  */
 void TrashManager::get_new_filename(filesystem::path& target, filesystem::path& trash, filesystem::path& return_value) {
-    for (auto& p : filesystem::directory_iterator(trash)) {
-        if (target.filename() == p.path().filename()) {
-            time_t cur_time = time(NULL);
-            string tim_str = string(ctime(&cur_time));
-            tim_str = remove_newline(tim_str);
-            // In this case, rename target one with appending deletion date.
-            return_value = trash / (target.filename().string() + " " + tim_str);
-        }
+    if (trashcan_lists.contains(target.filename().string())) {
+        time_t cur_time = time(NULL);
+        string tim_str = string(ctime(&cur_time));
+        tim_str = remove_newline(tim_str);
+        // In this case, rename target one with appending deletion date.
+        return_value = trash / (target.filename().string() + " " + tim_str);
     }
 }
 
@@ -482,6 +480,11 @@ TrashManager::TrashManager() {
         trash_path = "/Users/"+username_str+"/.Trash";
     } else {
         trash_path = string(DEFAULT_TRASH_LOCATION);
+    }
+
+    // Init hashmap
+    for (auto& p : filesystem::directory_iterator(trash_path)) {
+        trashcan_lists.insert(make_pair(p.path().filename(), p.path()));
     }
 
     // Check if NO trash directory found.
