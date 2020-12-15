@@ -1,7 +1,7 @@
 #include "TrashManager.h"
 
 void TrashManager::move_to_trash(UserDefinition& udf) {
-    for (int i = 0; i < file_to_remove.size(); i++) {
+    for (size_t i = 0; i < file_to_remove.size(); i++) {
         filesystem::path target(file_to_remove.at(i));
         filesystem::path destination_target;
 
@@ -203,7 +203,7 @@ void TrashManager::show_trashinfo() {
 }
 
 void TrashManager::open_trashrestore() {
-    int idx_input;
+    size_t idx_input;
     
     cout << "Restore Menu: " << endl;
     this->show_trashinfo();
@@ -322,7 +322,7 @@ TrashData TrashManager::create_trashdata(filesystem::path abstarget, filesystem:
 vector<string> TrashManager::split_string(string& input, char delim) {
     vector<string> ret_val;
     string tmpbuffer = "";
-    for (int i = 0; i < input.length(); i++) {
+    for (size_t i = 0; i < input.length(); i++) {
         if (input.at(i) == delim) {
             ret_val.push_back(tmpbuffer);
             tmpbuffer = "";
@@ -545,7 +545,7 @@ TrashManager::~TrashManager() {
  */
 string TrashManager::remove_newline(string& target) {
     string ret_val = "";
-    for (int i = 0; i < target.length(); i++) {
+    for (size_t i = 0; i < target.length(); i++) {
         if (target.at(i) != '\n') {
             ret_val += target.at(i);
         }
