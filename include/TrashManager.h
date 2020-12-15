@@ -29,6 +29,7 @@ private:
     filesystem::path trash_path;
     bool write_trashdata;
     unordered_map<string, filesystem::path> trashcan_lists;
+    string cwd_string;
 
     string get_usr_name();
     string remove_newline(string& target);

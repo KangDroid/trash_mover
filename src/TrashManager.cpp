@@ -33,7 +33,7 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         }
 
         // Append some information just before delete.
-        check_same_push(create_trashdata(filesystem::absolute(target), destination_target));
+        trash_list.push_back(create_trashdata(filesystem::absolute(target), destination_target));
         // move to trash!
         try {
             filesystem::rename(filesystem::absolute(target), destination_target);
@@ -298,18 +298,15 @@ TrashData TrashManager::create_trashdata(vector<string> lists) {
  * other one is creating trashdata from current run - time.
  */
 TrashData TrashManager::create_trashdata(filesystem::path abstarget, filesystem::path trashdir) {
-    char* buffer = new char[USERNAME_LIMIT];
     TrashData trash_data;
     trash_data.setDeletionTime(time(NULL));
     trash_data.setArgsList(args_list);
-    trash_data.setExeDir(string(getcwd(buffer, USERNAME_LIMIT)));
+    trash_data.setExeDir(cwd_string);
     trash_data.setFileDir(abstarget.string());
     trash_data.setTrashDir(trashdir.string());
 
     // For this case[new-trash data] deprecated field should be false though.
     trash_data.setDeprecated(false);
-
-    delete[] buffer;
 
     return trash_data;
 }
@@ -518,6 +515,9 @@ TrashManager::TrashManager() {
     }
 
     write_trashdata = true;
+    char* buffer = new char[USERNAME_LIMIT];
+    cwd_string = string(getcwd(buffer, USERNAME_LIMIT));
+    delete[] buffer;
 
     init_trashdata();
 }
