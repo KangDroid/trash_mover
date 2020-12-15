@@ -254,7 +254,7 @@ void TrashManager::init_trashdata() {
     }
     string buffer; // TEMP buffer
     while (getline(files_open, buffer)) {
-        check_same_push(create_trashdata(split_string(buffer, '\t')));
+        trash_list.push_back(create_trashdata(split_string(buffer, '\t')));
     }
 }
 
