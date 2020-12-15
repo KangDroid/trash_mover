@@ -5,6 +5,7 @@
 #include <map>
 #include <cstring>
 #include <cstdlib>
+#include <algorithm>
 #include <unistd.h>
 #include <getopt.h>
 
