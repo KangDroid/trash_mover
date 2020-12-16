@@ -1,12 +1,12 @@
 #include "TrashManager.h"
 
-void TrashManager::move_to_trash(UserDefinition& udf) {
-    for (size_t i = 0; i < file_to_remove.size(); i++) {
-        filesystem::path target(file_to_remove.at(i));
+void TrashManager::move_to_trash(UserDefinition* udf, int j) {
+    for (size_t i = 0; i < st_remove[j].file_to_remove.size(); i++) {
+        filesystem::path target(st_remove[j].file_to_remove.at(i));
         filesystem::path destination_target;
 
         // Return when type is folder, but -r option is not specified.
-        if (filesystem::status(target).type() == filesystem::file_type::directory && !udf.is_recursive_delete) {
+        if (filesystem::status(target).type() == filesystem::file_type::directory && !udf->is_recursive_delete) {
             cerr << "Recursive -r option is not specified, but folder is found." << endl;
             cerr << "Omitting directory: " << target << endl;
             continue;
@@ -18,11 +18,11 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         // Scan trash if same filename exists.
         get_new_filename(target, trash_path, destination_target);
 
-        if (udf.is_verbose) {
+        if (udf->is_verbose) {
             cout << filesystem::absolute(target) << " --> " << destination_target << endl;
         }
 
-        if (!udf.is_force) {
+        if (!udf->is_force) {
             string really;
             cout << "Really delete " << filesystem::absolute(target) << "?[y/n] : ";
             getline(cin, really);
@@ -33,7 +33,9 @@ void TrashManager::move_to_trash(UserDefinition& udf) {
         }
 
         // Append some information just before delete.
+        pthread_mutex_lock(&locker);
         trash_list.push_back(create_trashdata(filesystem::absolute(target), destination_target));
+        pthread_mutex_unlock(&locker);
         // move to trash!
         try {
             filesystem::rename(filesystem::absolute(target), destination_target);
@@ -172,7 +174,7 @@ show_help_now:
                 return -1;
             } else {
                 // move to trash
-                file_to_remove.push_back(current_path);
+                push_queue(current_path.string());
             }
         }
     }
