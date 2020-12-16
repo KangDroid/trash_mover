@@ -464,16 +464,16 @@ TrashManager::TrashManager() {
         trash_path = string(DEFAULT_TRASH_LOCATION);
     }
 
-    // Init hashmap
-    for (auto& p : filesystem::directory_iterator(trash_path)) {
-        trashcan_lists.insert(make_pair(p.path().filename(), p.path()));
-    }
-
     // Check if NO trash directory found.
     if (!filesystem::exists(trash_path)) {
         cerr << "No such file or directory: " << trash_path.string() << endl;
         cerr << "Contact Developer with log" << endl;
         exit(-1);
+    }
+
+    // Init hashmap
+    for (auto& p : filesystem::directory_iterator(trash_path)) {
+        trashcan_lists.insert(make_pair(p.path().filename(), p.path()));
     }
 
     // Dynamic
