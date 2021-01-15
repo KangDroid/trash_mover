@@ -3,12 +3,14 @@
 #include <filesystem>
 #include <vector>
 #include <map>
+#include <atomic>
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
 #include <unordered_map>
 #include <unistd.h>
 #include <getopt.h>
+#include <pthread/pthread.h>
 
 #include "UserDefinition.h"
 #include "TrashData.h"
@@ -31,6 +33,10 @@ private:
     unordered_map<string, filesystem::path> trashcan_lists;
     string cwd_string;
 
+    // Thread Related
+    pthread_t init_pthread;
+    atomic<bool> is_init_finished;
+
     string get_usr_name();
     string remove_newline(string& target);
     void get_new_filename(filesystem::path& target, filesystem::path& trash, filesystem::path& return_value);
@@ -50,4 +56,6 @@ public:
     int setargs(int argc, char** args, UserDefinition& usr_de);
     void show_trashinfo();
     void open_trashrestore();
+    void init_hashmap();
+    static void* init_hashmap_caller(void* trash_instance);
 };

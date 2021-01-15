@@ -224,12 +224,30 @@ void TrashManager::open_trashrestore() {
     restore_file(trash_list.at(idx_input));
 }
 
+void TrashManager::init_hashmap() {
+    for (auto& p : filesystem::directory_iterator(trash_path)) {
+        trashcan_lists.insert(make_pair(p.path().filename(), p.path()));
+    }
+    is_init_finished = true;
+}
+
+void* TrashManager::init_hashmap_caller(void* trash_instance) {
+    TrashManager* trash_manager = (TrashManager*) trash_instance;
+    trash_manager->init_hashmap();
+}
+
 /**
  * Checks for any duplicated[same-name] file on trash.
  * param: target - the filename to check, trash - the trash location.
  * return: edited path
  */
 void TrashManager::get_new_filename(filesystem::path& target, filesystem::path& trash, filesystem::path& return_value) {
+    
+    if (!is_init_finished.load()) {
+        cout << "Waiting for trashcan list to load.." << endl;
+        pthread_join(init_pthread, NULL);
+    }
+    
     if (trashcan_lists.contains(target.filename().string())) {
         time_t cur_time = time(NULL);
         string tim_str = string(ctime(&cur_time));
@@ -455,6 +473,8 @@ void TrashManager::print_version() {
 }
 
 TrashManager::TrashManager() {
+    init_pthread = NULL;
+    is_init_finished = false;
     if (!strcmp(DEFAULT_TRASH_LOCATION, IS_DYN)) {
         // Get username
         string username_str = get_usr_name();
@@ -472,9 +492,7 @@ TrashManager::TrashManager() {
     }
 
     // Init hashmap
-    for (auto& p : filesystem::directory_iterator(trash_path)) {
-        trashcan_lists.insert(make_pair(p.path().filename(), p.path()));
-    }
+    pthread_create(&this->init_pthread, NULL, init_hashmap_caller, this);
 
     // Dynamic
     if (!strcmp(DEFAULT_TRASH_DATA_LOCATION, IS_DYN)) {
